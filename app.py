@@ -17,7 +17,7 @@ app = Flask(__name__)
 # Load the TensorFlow Hub model
 from keras.layers import TFSMLayer
 
-my_reloaded_model = TFSMLayer("tf_hub_saved_model", call_endpoint='serving_default')
+my_reloaded_model = TFSMLayer("tf_hub_saved_model", call_endpoint="serving_default")
 
 # Tentukan path folder SavedModel
 saved_model_path = "Monulens_Model"
@@ -26,14 +26,13 @@ saved_model_path = "Monulens_Model"
 monulens_model = tf.saved_model.load(saved_model_path)
 
 # Set the path to your service account key (key.json)
-SERVICE_ACCOUNT_KEY_PATH = 'key.json'
+SERVICE_ACCOUNT_KEY_PATH = "key.json"
 
 # Initialize Google Cloud Storage client with the service account key
 storage_client = storage.Client.from_service_account_json(SERVICE_ACCOUNT_KEY_PATH)
 
 # Set your Google Cloud Storage bucket name
-BUCKET_NAME = os.environ.get('CLOUD_STORAGE_BUCKET', 'monulens-bucket')
-
+BUCKET_NAME = os.environ.get("CLOUD_STORAGE_BUCKET", "monulens-bucket")
 
 
 def predict_image(BUCKET_NAME, blob_name):
@@ -66,11 +65,13 @@ def predict_image(BUCKET_NAME, blob_name):
     ]
 
     predicted_class_names = [class_names[idx] for idx in top3_classes_idx]
-    predicted_probabilities = [float(prediction.numpy()[0][idx]) for idx in top3_classes_idx]
+    predicted_probabilities = [
+        float(prediction.numpy()[0][idx]) for idx in top3_classes_idx
+    ]
 
     return {
         "predicted_class_names": predicted_class_names,
-        "predicted_probabilities": predicted_probabilities
+        "predicted_probabilities": predicted_probabilities,
     }
 
 
@@ -87,28 +88,30 @@ def upload_to_bucket(file_storage, blob_name):
 
     # Clean up the temporary file
     os.remove(temp_file_path)
-    
+
 
 def get_service_key():
     client = secretmanager.SecretManagerServiceClient()
-    secret_name = "projects/YOUR_PROJECT_ID/secrets/monulens-service-key/versions/latest"
+    secret_name = "projects/354249218867/secrets/monulens-service-key/versions/latest"
     response = client.access_secret_version(request={"name": secret_name})
     secret_payload = response.payload.data.decode("UTF-8")
     return secret_payload
+
 
 # Simpan key.json ke file sementara
 service_key = get_service_key()
 with open("key.json", "w") as f:
     f.write(service_key)
 
-@app.route('/predict', methods=['POST'])
+
+@app.route("/predict", methods=["POST"])
 def predict():
-    if 'picture' not in request.files:
+    if "picture" not in request.files:
         return jsonify({"error": "No picture uploaded"}), 400
 
-    picture = request.files['picture']
+    picture = request.files["picture"]
 
-    if picture.filename == '':
+    if picture.filename == "":
         return jsonify({"error": "No selected picture"}), 400
 
     if picture:
@@ -124,5 +127,6 @@ def predict():
         # Return the prediction result as JSON
         return jsonify(prediction)
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080)

@@ -8,6 +8,7 @@ google-crc32c==1.5.0
 google-pasta==0.2.0
 google-resumable-media==2.7.0
 googleapis-common-protos==1.62.0
+google-cloud-secret-manager==2.15.0
 h5py==3.10.0
 keras==2.13.1
 numpy==1.24.3
