@@ -1,7 +1,7 @@
-Flask==2.0.3
-tensorflow-hub
+flask
 tensorflow
-google-cloud-storage
 pillow
+firebase-admin
+gunicorn
+requests
 numpy
-werkzeug==2.0.3
